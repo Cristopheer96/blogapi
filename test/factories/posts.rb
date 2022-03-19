@@ -12,4 +12,11 @@ FactoryBot.define do
     }
     user # factobu bot hace referencia al factory de user
   end
+
+  factory :published_post, class:'Post' do
+    title { Faker::Lorem.sentence }
+    content { Faker::Lorem.paragraph }
+    published { true  }
+    user # factobu bot hace referencia al factory de user
+  end
 end

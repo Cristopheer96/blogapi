@@ -10,6 +10,5 @@ class PostSerializer < ActiveModel::Serializer
       email: user.email,
       id: user.id
      }
-
   end
 end

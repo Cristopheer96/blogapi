@@ -1,3 +1,4 @@
+require 'byebug'
 class PostsController < ApplicationController
 
   rescue_from Exception do |e|
@@ -10,6 +11,10 @@ class PostsController < ApplicationController
 
   def index
     @posts = Post.where(published: true)
+    if !params[:search].nil?
+      @posts = PostsSearchService.search(@posts, params[:search])
+    end
+
     render json: @posts, status: :ok
   end
 
