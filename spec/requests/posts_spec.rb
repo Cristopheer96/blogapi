@@ -10,21 +10,6 @@ RSpec.describe 'Posts ', type: :request do
       expect(payload).to be_empty
       expect(response).to have_http_status(200)
     end
-
-    # describe 'Search ' do
-    #   let!(:hola_mundo) { create(:published_post, title: 'hola mundo') }
-    #   let!(:hola_rails) { create(:published_post, title: 'hola rails') }
-    #   let!(:curso_rails) { create(:published_post, title: 'curso_rail') }
-
-    #   it 'should filter posts by title' do
-    #     get "/posts?search=hola"
-    #     payload = JSON.parse(response.body)
-    #     byebug
-    #     expect(payload).to_not be_empty
-    #     expect(payload.size).to eq(2)
-    #     expect(payload.map{|p| p['id']}.sort ).to eq(hola_mundo.id, hola_rails.id)
-    #   end
-    # end
     describe "Search" do
       let!(:hola_mundo) { create(:published_post, title: 'Hola Mundo') }
       let!(:hola_rails) { create(:published_post, title: 'Hola Rails') }
