@@ -19,47 +19,58 @@ RSpec.describe 'Posts with authentication ', type: :request do
    describe 'GET /post' do # es descriptivo no codea nada
 
     describe 'GET /post/{id} 'do
-      context 'with authentication valid'do
-        context 'when requisting other author post'do
-          context 'when post is public'do
+      context 'With authentication valid.'do
+        context 'When requisting other author post.'do
+          context 'When post is public.'do
             before { get "/posts/#{other_user_post.id}", headers: auth_headers }
             #pay load
-            context 'pay load' do
-              subject { JSON.parse(response.body) }
+            context 'Pay load.' do
+              subject { payload }
               it { is_expected.to include(:id)}
             end
-            context 'response' do
+            context 'Response.' do
               subject { response}
               it { is_expected.to have_http_status(:ok)}
             end
             #reponse
           end
-          context 'when post is not public' do
+          context 'When post is not public.' do
             before { get "/posts/#{other_user_post_draft.id}", headers: auth_headers }
             #pay load
-            context 'pay load' do
-              subject { JSON.parse(response.body) }
+            context 'Pay load.' do
+              subject { payload }
               it { is_expected.to include(:error)}
             end
-            context 'response' do
-              subject { response}
+            context 'Response' do
+              subject { response }
               it { is_expected.to have_http_status(:not_found) }
             end
           end
         end
-        context 'when requisiting user post'do
+        context 'When requisiting user post'do
 
         end
       end
     end
 
-    describe 'GET /post/{id} 'do
+    describe 'POST /post/{id} 'do
+      #con authentication se pued crear
+      #sin authtentacation no se puede crear
 
     end
 
-    describe 'GET /post/{id} 'do
-
+    describe 'PUT /post/{id} 'do
+      # con auth  :
+        #actualizar un post nuestro
+        # no se puede actualizar un poso de otro : 401
+      # sin authentication no se podra actualizar
     end
+  end
+
+  private
+
+  def payload
+    JSON.parse(response.body).with_indifferent_access
   end
 
 end
