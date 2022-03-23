@@ -8,15 +8,17 @@ RSpec.describe 'Posts with authentication ', type: :request do
   let!(:other_user_post) { create(:post, user_id: other_user.id, published: true) }
   let!(:other_user_post_draft) { create(:post, user_id: other_user.id, published: false) }
 
-  let!(:auth_headers) { {'Authorizacion' => "Bearer #{user.auth_token}"} }
-  let!(:other_auth_headers) { {'Authorizacion' => "Bearer #{other_user.auth_token}"} }
+  let!(:auth_headers) { { 'Authorization' => "Bearer #{user.auth_token}" } }
 
-
+  let!(:other_auth_headers) { {'Authorization' => "Bearer #{other_user.auth_token}"} }
+  let!(:create_params) { { "post" => {"title" => "title", "content" => "content", "published" => true}} }# posts_controller.rb 48 en el metodo create params  requerimos un post co
+  let!(:update_params) { { "post" => {"title" => "title", "content" => "content", "published" => true}} }
     #request con authenticatin en http hay un header adicional donde se espepcifica el token
   # asi esl header para enviar token de autorizacion  => "Authorization: Bearer xxxx"
 
 
-   describe 'GET /post' do # es descriptivo no codea nada
+
+  describe 'GET /post' do # es descriptivo no codea nada
 
     describe 'GET /post/{id} 'do
       context 'With authentication valid.'do
@@ -53,20 +55,72 @@ RSpec.describe 'Posts with authentication ', type: :request do
       end
     end
 
-    describe 'POST /post/{id} 'do
-      #con authentication se pued crear
-      #sin authtentacation no se puede crear
+  end
 
+  describe "POST /posts" do
+    # con auth -> crear
+    context "with valid auth" do
+      before { post "/posts", params: create_params, headers: auth_headers }
+
+      context "payload incluuuude" do
+        subject { payload }
+        it { is_expected.to include(:id, :title, :content, :published, :author) }
+      end
+      context "response" do
+        subject { response }
+        it { is_expected.to have_http_status(:created) }
+      end
     end
-
-    describe 'PUT /post/{id} 'do
-      # con auth  :
-        #actualizar un post nuestro
-        # no se puede actualizar un poso de otro : 401
-      # sin authentication no se podra actualizar
+    # sin auth -> !crear -> 401
+    context 'without authentication' do
+       before { post "/posts", params: create_params }
+      context "payload incluuuude" do
+        subject { payload }
+        it { is_expected.to include(:error) }
+      end
+      context "response" do
+        subject { response }
+        it { is_expected.to have_http_status(:unauthorized) }
+      end
     end
   end
 
+  describe 'PUT /post/{id} 'do
+    # con auth  :
+    #actualizar un post nuestro
+    # no se puede actualizar un poso de otro : 401
+    context "With valid auth" do
+      context' When updating user post'do
+        before { put "/posts/#{user_post.id}", params: update_params, headers: auth_headers }
+        context "payload incluuuude" do
+          subject { payload }
+          it "expect include" do
+            is_expected.to include(:id, :title, :content, :published, :author)
+          end
+          it { expect(payload[:id]).to eq(user_post.id) }
+        end
+        context "response" do
+          subject { response }
+          it { is_expected.to have_http_status(:ok) }
+        end
+      end
+
+      context ' when updatin other users"s post' do
+        before { put "/posts/#{other_user_post.id}", params: update_params, headers: auth_headers }
+        context "payload incluuuude" do
+          subject { payload }
+          it "expect include" do
+            is_expected.to include(:error)
+          end
+        end
+        context "response" do
+          subject { response }
+          it { is_expected.to have_http_status(:not_found) }
+        end
+      end
+    end
+    # sin authentication no se podra actualizar
+  end
   private
 
   def payload
@@ -74,3 +128,6 @@ RSpec.describe 'Posts with authentication ', type: :request do
   end
 
 end
+
+
+### prueba prueba
